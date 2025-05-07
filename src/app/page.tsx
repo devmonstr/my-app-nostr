@@ -12,7 +12,7 @@ export default function Home() {
   const [relays, setRelays] = useState('');
 
   const notifySuccess = (message: string) => toast.success(message, {
-    position: "top-right",
+    position: "top-center",
     autoClose: 3000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -22,7 +22,7 @@ export default function Home() {
   });
 
   const notifyError = (message: string) => toast.error(message, {
-    position: "top-right",
+    position: "top-center",
     autoClose: 5000,
     hideProgressBar: false,
     closeOnClick: true,

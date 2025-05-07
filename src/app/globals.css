@@ -8,11 +8,20 @@ body {
 }
 
 /* ปรับแต่ง React Toastify */
+.Toastify__toast-container--top-center {
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 90%;
+  max-width: 400px;
+}
+
 .Toastify__toast {
   border-radius: 8px;
   font-family: Arial, sans-serif;
   font-size: 16px;
   padding: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .Toastify__toast--success {
