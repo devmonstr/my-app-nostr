@@ -29,27 +29,27 @@ export default function Navbar() {
   }, []);
 
   return (
-    <nav className="bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
+    <nav className="bg-nostr text-white shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="text-2xl font-bold">
-              monstr.dev
+              Nostr Provider
             </Link>
-            <span className="ml-3 text-sm bg-blue-900 text-white rounded-full px-2 py-1">
+            <span className="ml-3 text-sm bg-primary text-white rounded-full px-2 py-1">
               {memberCount} Members
             </span>
           </div>
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/" className="hover:bg-blue-700 px-3 py-2 rounded-md">
+            <Link href="/" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
               Home
             </Link>
-            <Link href="/account" className="hover:bg-blue-700 px-3 py-2 rounded-md">
+            <Link href="/account" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
               Account
             </Link>
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-md hover:bg-blue-700 focus:outline-none"
+              className="p-2 rounded-md hover:bg-nostr-hover focus:outline-none"
             >
               {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
             </button>
@@ -65,18 +65,18 @@ export default function Navbar() {
         </div>
       </div>
       {isOpen && (
-        <div className="md:hidden bg-blue-700">
+        <div className="md:hidden bg-primary">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             <Link
               href="/"
-              className="block hover:bg-blue-600 px-3 py-2 rounded-md"
+              className="block hover:bg-nostr-hover px-3 py-2 rounded-md"
               onClick={toggleMenu}
             >
               Home
             </Link>
             <Link
               href="/account"
-              className="block hover:bg-blue-600 px-3 py-2 rounded-md"
+              className="block hover:bg-nostr-hover px-3 py-2 rounded-md"
               onClick={toggleMenu}
             >
               Account

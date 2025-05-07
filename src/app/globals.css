@@ -11,21 +11,29 @@ body {
 
 /* Light and Dark Theme */
 :root {
-  --background: #f3f4f6;
-  --foreground: #1f2937;
-  --card-bg: #ffffff;
-  --card-border: #e5e7eb;
-  --input-bg: #ffffff;
-  --input-border: #d1d5db;
+  --background: #f9fafb; /* Tailwind gray-50 */
+  --foreground: #1f2937; /* Tailwind gray-900 */
+  --card-bg: #ffffff; /* White */
+  --card-border: #e5e7eb; /* Tailwind gray-200 */
+  --input-bg: #ffffff; /* White */
+  --input-border: #d1d5db; /* Tailwind gray-300 */
+  --primary: #7c3aed; /* Tailwind purple-600 */
+  --primary-hover: #6d28d9; /* Tailwind purple-700 */
+  --secondary: #f59e0b; /* Tailwind orange-500 */
+  --secondary-hover: #d97706; /* Tailwind orange-600 */
 }
 
 .dark {
-  --background: #111827;
-  --foreground: #d1d5db;
-  --card-bg: #1f2937;
-  --card-border: #374151;
-  --input-bg: #374151;
-  --input-border: #4b5563;
+  --background: #1a202c; /* Tailwind gray-900 */
+  --foreground: #e5e7eb; /* Tailwind gray-200 */
+  --card-bg: #2d3748; /* Tailwind gray-800 */
+  --card-border: #4b5563; /* Tailwind gray-700 */
+  --input-bg: #4b5563; /* Tailwind gray-700 */
+  --input-border: #6b7280; /* Tailwind gray-600 */
+  --primary: #a78bfa; /* Tailwind purple-400 */
+  --primary-hover: #8b5cf6; /* Tailwind purple-500 */
+  --secondary: #f97316; /* Tailwind orange-400 */
+  --secondary-hover: #ea580c; /* Tailwind orange-500 */
 }
 
 .bg-background {
@@ -49,6 +57,40 @@ body {
   border-color: var(--input-border);
 }
 
+/* สไตล์สำหรับปุ่ม */
+.bg-primary {
+  background-color: var(--primary);
+}
+
+.hover\:bg-primary-hover:hover {
+  background-color: var(--primary-hover);
+}
+
+.bg-secondary {
+  background-color: var(--secondary);
+}
+
+.hover\:bg-secondary-hover:hover {
+  background-color: var(--secondary-hover);
+}
+
+.bg-gray-600 {
+  background-color: #4b5563; /* Tailwind gray-600 */
+}
+
+.hover\:bg-gray-700:hover {
+  background-color: #374151; /* Tailwind gray-700 */
+}
+
+/* สไตล์สำหรับ Navbar */
+.bg-nostr {
+  background: linear-gradient(to right, var(--primary), var(--secondary));
+}
+
+.hover\:bg-nostr-hover:hover {
+  background-color: var(--primary-hover);
+}
+
 /* ปรับแต่ง React Toastify */
 .Toastify__toast-container--top-center {
   top: 50% !important;
@@ -68,12 +110,12 @@ body {
 }
 
 .Toastify__toast--success {
-  background-color: #10b981; /* Tailwind green-500 */
+  background-color: var(--secondary); /* Orange */
   color: white;
 }
 
 .Toastify__toast--error {
-  background-color: #ef4444; /* Tailwind red-500 */
+  background-color: #dc2626; /* Tailwind red-600 */
   color: white;
 }
 
@@ -84,36 +126,6 @@ body {
 
 .Toastify__progress-bar {
   background-color: rgba(255, 255, 255, 0.7);
-}
-
-/* สไตล์สำหรับปุ่ม */
-.bg-blue-600 {
-  background-color: #2563eb; /* Tailwind blue-600 */
-}
-
-.hover\:bg-blue-700:hover {
-  background-color: #1d4ed8; /* Tailwind blue-700 */
-}
-
-.bg-green-600 {
-  background-color: #16a34a; /* Tailwind green-600 */
-}
-
-.hover\:bg-green-700:hover {
-  background-color: #15803d; /* Tailwind green-700 */
-}
-
-.bg-gray-600 {
-  background-color: #4b5563; /* Tailwind gray-600 */
-}
-
-.hover\:bg-gray-700:hover {
-  background-color: #374151; /* Tailwind gray-700 */
-}
-
-/* สไตล์สำหรับจำนวนสมาชิก */
-.bg-blue-900 {
-  background-color: #1e3a8a; /* Tailwind blue-900 */
 }
 
 /* Responsive adjustments */

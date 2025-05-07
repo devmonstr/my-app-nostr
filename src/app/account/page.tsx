@@ -157,13 +157,13 @@ function AccountContent() {
                 id="publicKey"
                 value={publicKey}
                 onChange={handlePublicKeyChange}
-                className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-input-bg border-input-border text-foreground"
+                className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
                 required
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white p-3 rounded-lg hover:bg-blue-700 transition"
+              className="w-full bg-primary text-white p-3 rounded-lg hover:bg-primary-hover transition"
             >
               Fetch Account
             </button>
@@ -179,7 +179,7 @@ function AccountContent() {
                 id="username"
                 value={username}
                 onChange={handleUsernameChange}
-                className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-input-bg border-input-border text-foreground"
+                className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
                 required
               />
             </div>
@@ -192,7 +192,7 @@ function AccountContent() {
                 id="lightningAddress"
                 value={lightningAddress}
                 onChange={(e) => setLightningAddress(e.target.value)}
-                className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-input-bg border-input-border text-foreground"
+                className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
               />
             </div>
             <div>
@@ -204,13 +204,13 @@ function AccountContent() {
                 id="relays"
                 value={relays}
                 onChange={(e) => setRelays(e.target.value)}
-                className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-blue-500 transition bg-input-bg border-input-border text-foreground"
+                className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
                 placeholder="wss://relay1.com,wss://relay2.com"
               />
             </div>
             <button
               type="submit"
-              className="w-full bg-green-600 text-white p-3 rounded-lg hover:bg-green-700 transition"
+              className="w-full bg-primary text-white p-3 rounded-lg hover:bg-primary-hover transition"
             >
               Update Account
             </button>
