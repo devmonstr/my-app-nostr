@@ -49,21 +49,19 @@ function HomeContent() {
 
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setPublicKey(value); // เก็บค่า raw input เพื่อให้ผู้ใช้พิมพ์ได้
+    setPublicKey(value);
   };
 
   const validateAndConvertPublicKey = (input: string): string | null => {
-    // ตรวจสอบว่าเป็น hex (64 ตัวอักษร)
     if (/^[a-fA-F0-9]{64}$/.test(input)) {
       return input.toLowerCase();
     }
 
-    // ตรวจสอบว่าเป็น npub และแปลงเป็น hex
     if (input.startsWith('npub1')) {
       try {
         const decoded = nip19.decode(input);
         if (decoded.type === 'npub') {
-          return decoded.data; // คืนค่า hex
+          return decoded.data;
         }
       } catch (error) {
         return null;
@@ -71,6 +69,26 @@ function HomeContent() {
     }
 
     return null;
+  };
+
+  const handleRegisterWithExtension = async () => {
+    if (!window.nostr) {
+      notifyError('Nostr extension not detected. Please install Alby, Nos2x, or Nostore.');
+      return;
+    }
+
+    try {
+      const pubkey = await window.nostr.getPublicKey();
+      if (!pubkey || !/^[a-fA-F0-9]{64}$/.test(pubkey)) {
+        notifyError('Invalid public key received from extension');
+        return;
+      }
+
+      setPublicKey(pubkey);
+      notifySuccess('Public key loaded from Nostr extension. Please complete the form to register.');
+    } catch (error: any) {
+      notifyError(`Failed to get public key from extension: ${error.message}`);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -166,6 +184,7 @@ function HomeContent() {
               value={publicKey}
               onChange={handlePublicKeyChange}
               className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
+              placeholder="Enter hex, npub, or use extension"
               required
             />
           </div>
@@ -201,8 +220,14 @@ function HomeContent() {
             Register
           </button>
         </form>
+        <button
+          onClick={handleRegisterWithExtension}
+          className="w-full mt-4 bg-secondary text-white p-3 rounded-lg hover:bg-secondary-hover transition"
+        >
+          Register with Nostr Extension
+        </button>
         <Link href="/account">
-          <button className="w-full mt-4 bg-secondary text-white p-3 rounded-lg hover:bg-secondary-hover transition">
+          <button className="w-full mt-4 bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition">
             Manage Account
           </button>
         </Link>
