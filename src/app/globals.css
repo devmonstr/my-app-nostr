@@ -42,3 +42,12 @@ body {
 .Toastify__progress-bar {
   background-color: rgba(255, 255, 255, 0.7);
 }
+
+/* สไตล์สำหรับปุ่ม Update Account */
+.bg-green-600 {
+  background-color: #16a34a; /* Tailwind green-600 */
+}
+
+.hover\:bg-green-700:hover {
+  background-color: #15803d; /* Tailwind green-700 */
+}
