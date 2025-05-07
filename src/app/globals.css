@@ -4,7 +4,49 @@
 @tailwind utilities;
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', Arial, sans-serif;
+  margin: 0;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Light and Dark Theme */
+:root {
+  --background: #f3f4f6;
+  --foreground: #1f2937;
+  --card-bg: #ffffff;
+  --card-border: #e5e7eb;
+  --input-bg: #ffffff;
+  --input-border: #d1d5db;
+}
+
+.dark {
+  --background: #111827;
+  --foreground: #d1d5db;
+  --card-bg: #1f2937;
+  --card-border: #374151;
+  --input-bg: #374151;
+  --input-border: #4b5563;
+}
+
+.bg-background {
+  background: var(--background);
+}
+
+.text-foreground {
+  color: var(--foreground);
+}
+
+.bg-card-bg {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+.bg-input-bg {
+  background: var(--input-bg);
+}
+
+.border-input-border {
+  border-color: var(--input-border);
 }
 
 /* ปรับแต่ง React Toastify */
@@ -18,10 +60,11 @@ body {
 
 .Toastify__toast {
   border-radius: 8px;
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', Arial, sans-serif;
   font-size: 16px;
   padding: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .Toastify__toast--success {
@@ -43,7 +86,15 @@ body {
   background-color: rgba(255, 255, 255, 0.7);
 }
 
-/* สไตล์สำหรับปุ่ม Update Account */
+/* สไตล์สำหรับปุ่ม */
+.bg-blue-600 {
+  background-color: #2563eb; /* Tailwind blue-600 */
+}
+
+.hover\:bg-blue-700:hover {
+  background-color: #1d4ed8; /* Tailwind blue-700 */
+}
+
 .bg-green-600 {
   background-color: #16a34a; /* Tailwind green-600 */
 }
@@ -52,11 +103,35 @@ body {
   background-color: #15803d; /* Tailwind green-700 */
 }
 
-/* สไตล์สำหรับปุ่ม Manage Account */
 .bg-gray-600 {
   background-color: #4b5563; /* Tailwind gray-600 */
 }
 
 .hover\:bg-gray-700:hover {
   background-color: #374151; /* Tailwind gray-700 */
+}
+
+/* สไตล์สำหรับจำนวนสมาชิก */
+.bg-blue-900 {
+  background-color: #1e3a8a; /* Tailwind blue-900 */
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .max-w-md {
+    max-width: 100%;
+  }
+
+  .text-3xl {
+    font-size: 1.875rem;
+  }
+
+  .p-8 {
+    padding: 1.5rem;
+  }
 }
