@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     'Access-Control-Allow-Origin': '*', // หรือระบุ origin เช่น 'http://192.168.1.96:3001'
     'Access-Control-Allow-Methods': 'GET, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Credentials': true,
   };
 
   // จัดการคำขอ OPTIONS (สำหรับ preflight requests)
