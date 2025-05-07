@@ -51,3 +51,12 @@ body {
 .hover\:bg-green-700:hover {
   background-color: #15803d; /* Tailwind green-700 */
 }
+
+/* สไตล์สำหรับปุ่ม Manage Account */
+.bg-gray-600 {
+  background-color: #4b5563; /* Tailwind gray-600 */
+}
+
+.hover\:bg-gray-700:hover {
+  background-color: #374151; /* Tailwind gray-700 */
+}

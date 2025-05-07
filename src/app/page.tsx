@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Link from 'next/link';
 
 export default function Home() {
   const [username, setUsername] = useState('');
@@ -39,7 +40,6 @@ export default function Home() {
     }
 
     try {
-      // ตรวจสอบ username และ public_key ซ้ำ
       const { data: existingUser, error: checkError } = await supabase
         .from('registered_users')
         .select('username, public_key')
@@ -141,7 +141,7 @@ export default function Home() {
               type="text"
               id="relays"
               value={relays}
-              onChange={(e) => setRelays(e.target.value)}
+              onChange={(e) => setPublicKey(e.target.value)}
               className="mt-1 p-2 w-full border rounded-md"
               placeholder="wss://relay1.com,wss://relay2.com"
             />
@@ -153,7 +153,12 @@ export default function Home() {
             Register
           </button>
         </form>
-        <ToastContainer />
+        <Link href="/account">
+          <button className="w-full mt-4 bg-gray-600 text-white p-2 rounded-md hover:bg-gray-700">
+            Manage Account
+          </button>
+        </Link>
+        <ToastContainer position="top-center" />
       </div>
     </div>
   );
