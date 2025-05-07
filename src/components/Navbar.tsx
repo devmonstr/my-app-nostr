@@ -34,7 +34,7 @@ export default function Navbar() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="text-2xl font-bold">
-              Nostr Provider
+              Monstr
             </Link>
             <span className="ml-3 text-sm bg-primary text-white rounded-full px-2 py-1">
               {memberCount} Members
