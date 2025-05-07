@@ -10,8 +10,8 @@ export async function GET(request: Request) {
   // กำหนด CORS headers
   const headers = {
     'Access-Control-Allow-Origin': '*', // หรือระบุ origin เช่น 'http://192.168.1.96:3001'
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH, DELETE, POST, PUT',
+    'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
     'Access-Control-Allow-Credentials': true,
   };
 
