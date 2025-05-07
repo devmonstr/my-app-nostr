@@ -2,18 +2,39 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function Home() {
   const [username, setUsername] = useState('');
   const [publicKey, setPublicKey] = useState('');
   const [lightningAddress, setLightningAddress] = useState('');
   const [relays, setRelays] = useState('');
-  const [message, setMessage] = useState('');
+
+  const notifySuccess = (message: string) => toast.success(message, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "light",
+  });
+
+  const notifyError = (message: string) => toast.error(message, {
+    position: "top-right",
+    autoClose: 5000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    theme: "light",
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!/^[0-9a-f]{64}$/i.test(publicKey)) {
-      setMessage('Error: Public key must be a 64-character hex string');
+      notifyError('Public key must be a 64-character hex string');
       return;
     }
 
@@ -25,17 +46,17 @@ export default function Home() {
         .or(`username.eq.${username},public_key.eq.${publicKey}`);
 
       if (checkError) {
-        setMessage(`Error: Failed to check existing data - ${checkError.message}`);
+        notifyError(`Failed to check existing data: ${checkError.message}`);
         return;
       }
 
       if (existingUser && existingUser.length > 0) {
         if (existingUser.some((user) => user.username === username)) {
-          setMessage('Error: Username is already taken');
+          notifyError('Username is already taken');
           return;
         }
         if (existingUser.some((user) => user.public_key === publicKey)) {
-          setMessage('Error: Public key is already registered');
+          notifyError('Public key is already registered');
           return;
         }
       }
@@ -52,21 +73,20 @@ export default function Home() {
 
       if (error) {
         if (error.code === '23505') {
-          // Unique constraint violation
-          setMessage('Error: Username or Public key is already taken');
+          notifyError('Username or Public key is already taken');
         } else {
-          setMessage(`Error: ${error.message}`);
+          notifyError(error.message);
         }
         return;
       }
 
-      setMessage('Registration successful!');
+      notifySuccess('Registration successful!');
       setUsername('');
       setPublicKey('');
       setLightningAddress('');
       setRelays('');
     } catch (error: any) {
-      setMessage(`Error: ${error.message}`);
+      notifyError(error.message);
     }
   };
 
@@ -133,7 +153,7 @@ export default function Home() {
             Register
           </button>
         </form>
-        {message && <p className="mt-4 text-center text-sm text-gray-600">{message}</p>}
+        <ToastContainer />
       </div>
     </div>
   );
