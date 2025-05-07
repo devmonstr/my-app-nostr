@@ -7,24 +7,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const name = searchParams.get('name') || '_';
 
-  // กำหนด CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*', // หรือระบุ origin เช่น 'http://192.168.1.96:3001'
-    'Access-Control-Allow-Methods': 'GET, OPTIONS, PATCH, DELETE, POST, PUT',
-    'Access-Control-Allow-Headers': 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version',
-    'Access-Control-Allow-Credentials': true,
-  };
-
-  // จัดการคำขอ OPTIONS (สำหรับ preflight requests)
-  if (request.method === 'OPTIONS') {
-    return new Response(null, { status: 204, headers });
-  }
-
   if (name === '_') {
-    return NextResponse.json({
-      names: {},
-      relays: {},
-    });
+    return NextResponse.json({ names: {}, relays: {} });
   }
 
   const { data, error } = await supabase
