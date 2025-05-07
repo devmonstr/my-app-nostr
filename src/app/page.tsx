@@ -7,6 +7,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider, useTheme } from '@/components/ThemeProvider';
+import { nip19 } from 'nostr-tools';
 
 function HomeContent() {
   const [username, setUsername] = useState('');
@@ -48,22 +49,41 @@ function HomeContent() {
 
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^[a-fA-F0-9]*$/.test(value)) {
-      setPublicKey(value);
-    } else {
-      notifyError('Public Key must contain only hexadecimal characters (0-9, a-f, A-F)');
+    setPublicKey(value); // เก็บค่า raw input เพื่อให้ผู้ใช้พิมพ์ได้
+  };
+
+  const validateAndConvertPublicKey = (input: string): string | null => {
+    // ตรวจสอบว่าเป็น hex (64 ตัวอักษร)
+    if (/^[a-fA-F0-9]{64}$/.test(input)) {
+      return input.toLowerCase();
     }
+
+    // ตรวจสอบว่าเป็น npub และแปลงเป็น hex
+    if (input.startsWith('npub1')) {
+      try {
+        const decoded = nip19.decode(input);
+        if (decoded.type === 'npub') {
+          return decoded.data; // คืนค่า hex
+        }
+      } catch (error) {
+        return null;
+      }
+    }
+
+    return null;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!/^[a-fA-F0-9]{64}$/.test(publicKey)) {
-      notifyError('Public key must be a 64-character hexadecimal string');
-      return;
-    }
 
     if (!/^[a-zA-Z0-9]+$/.test(username)) {
       notifyError('Username must contain only letters and numbers');
+      return;
+    }
+
+    const convertedPublicKey = validateAndConvertPublicKey(publicKey);
+    if (!convertedPublicKey) {
+      notifyError('Public key must be a 64-character hexadecimal string or a valid npub');
       return;
     }
 
@@ -71,7 +91,7 @@ function HomeContent() {
       const { data: existingUser, error: checkError } = await supabase
         .from('registered_users')
         .select('username, public_key')
-        .or(`username.eq.${username},public_key.eq.${publicKey}`);
+        .or(`username.eq.${username},public_key.eq.${convertedPublicKey}`);
 
       if (checkError) {
         notifyError(`Failed to check existing data: ${checkError.message}`);
@@ -83,7 +103,7 @@ function HomeContent() {
           notifyError('Username is already taken');
           return;
         }
-        if (existingUser.some((user) => user.public_key === publicKey)) {
+        if (existingUser.some((user) => user.public_key === convertedPublicKey)) {
           notifyError('Public key is already registered');
           return;
         }
@@ -94,7 +114,7 @@ function HomeContent() {
         .from('registered_users')
         .insert({
           username,
-          public_key: publicKey,
+          public_key: convertedPublicKey,
           lightning_address: lightningAddress || null,
           relays: relaysArray,
         });
@@ -121,7 +141,7 @@ function HomeContent() {
   return (
     <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[calc(100vh-4rem)]">
       <div className="bg-card-bg p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-md transform transition-all hover:scale-105">
-        <h1 className="text-3xl font-bold mb-6 text-center">Nostr Address Provider</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">Free NIP-05 Identifiers</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="username" className="block text-sm font-medium">
@@ -138,7 +158,7 @@ function HomeContent() {
           </div>
           <div>
             <label htmlFor="publicKey" className="block text-sm font-medium">
-              Public Key (hex)
+              Public Key (hex or npub)
             </label>
             <input
               type="text"

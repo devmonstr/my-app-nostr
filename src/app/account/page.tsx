@@ -6,6 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider, useTheme } from '@/components/ThemeProvider';
+import { nip19 } from 'nostr-tools';
 
 function AccountContent() {
   const [publicKey, setPublicKey] = useState('');
@@ -43,11 +44,7 @@ function AccountContent() {
 
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    if (/^[a-fA-F0-9]*$/.test(value)) {
-      setPublicKey(value);
-    } else {
-      notifyError('Public Key must contain only hexadecimal characters (0-9, a-f, A-F)');
-    }
+    setPublicKey(value); // เก็บค่า raw input เพื่อให้ผู้ใช้พิมพ์ได้
   };
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,10 +56,32 @@ function AccountContent() {
     }
   };
 
+  const validateAndConvertPublicKey = (input: string): string | null => {
+    // ตรวจสอบว่าเป็น hex (64 ตัวอักษร)
+    if (/^[a-fA-F0-9]{64}$/.test(input)) {
+      return input.toLowerCase();
+    }
+
+    // ตรวจสอบว่าเป็น npub และแปลงเป็น hex
+    if (input.startsWith('npub1')) {
+      try {
+        const decoded = nip19.decode(input);
+        if (decoded.type === 'npub') {
+          return decoded.data; // คืนค่า hex
+        }
+      } catch (error) {
+        return null;
+      }
+    }
+
+    return null;
+  };
+
   const handleFetchUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!/^[a-fA-F0-9]{64}$/.test(publicKey)) {
-      notifyError('Public key must be a 64-character hexadecimal string');
+    const convertedPublicKey = validateAndConvertPublicKey(publicKey);
+    if (!convertedPublicKey) {
+      notifyError('Public key must be a 64-character hexadecimal string or a valid npub');
       return;
     }
 
@@ -70,7 +89,7 @@ function AccountContent() {
       const { data, error } = await supabase
         .from('registered_users')
         .select('username, lightning_address, relays')
-        .eq('public_key', publicKey)
+        .eq('public_key', convertedPublicKey)
         .single();
 
       if (error || !data) {
@@ -124,7 +143,7 @@ function AccountContent() {
           lightning_address: lightningAddress || null,
           relays: relaysArray,
         })
-        .eq('public_key', publicKey);
+        .eq('public_key', validateAndConvertPublicKey(publicKey));
 
       if (error) {
         if (error.code === '23505') {
@@ -150,7 +169,7 @@ function AccountContent() {
           <form onSubmit={handleFetchUser} className="space-y-4">
             <div>
               <label htmlFor="publicKey" className="block text-sm font-medium">
-                Public Key (hex)
+                Public Key (hex or npub)
               </label>
               <input
                 type="text"
