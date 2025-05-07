@@ -16,7 +16,30 @@ export default function Home() {
       setMessage('Error: Public key must be a 64-character hex string');
       return;
     }
+
     try {
+      // ตรวจสอบ username และ public_key ซ้ำ
+      const { data: existingUser, error: checkError } = await supabase
+        .from('registered_users')
+        .select('username, public_key')
+        .or(`username.eq.${username},public_key.eq.${publicKey}`);
+
+      if (checkError) {
+        setMessage(`Error: Failed to check existing data - ${checkError.message}`);
+        return;
+      }
+
+      if (existingUser && existingUser.length > 0) {
+        if (existingUser.some((user) => user.username === username)) {
+          setMessage('Error: Username is already taken');
+          return;
+        }
+        if (existingUser.some((user) => user.public_key === publicKey)) {
+          setMessage('Error: Public key is already registered');
+          return;
+        }
+      }
+
       const relaysArray = relays ? relays.split(',').map((r) => r.trim()) : null;
       const { error } = await supabase
         .from('registered_users')
@@ -26,7 +49,17 @@ export default function Home() {
           lightning_address: lightningAddress || null,
           relays: relaysArray,
         });
-      if (error) throw error;
+
+      if (error) {
+        if (error.code === '23505') {
+          // Unique constraint violation
+          setMessage('Error: Username or Public key is already taken');
+        } else {
+          setMessage(`Error: ${error.message}`);
+        }
+        return;
+      }
+
       setMessage('Registration successful!');
       setUsername('');
       setPublicKey('');
