@@ -44,7 +44,7 @@ function AccountContent() {
 
   const handlePublicKeyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setPublicKey(value); // เก็บค่า raw input เพื่อให้ผู้ใช้พิมพ์ได้
+    setPublicKey(value);
   };
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,17 +57,15 @@ function AccountContent() {
   };
 
   const validateAndConvertPublicKey = (input: string): string | null => {
-    // ตรวจสอบว่าเป็น hex (64 ตัวอักษร)
     if (/^[a-fA-F0-9]{64}$/.test(input)) {
       return input.toLowerCase();
     }
 
-    // ตรวจสอบว่าเป็น npub และแปลงเป็น hex
     if (input.startsWith('npub1')) {
       try {
         const decoded = nip19.decode(input);
         if (decoded.type === 'npub') {
-          return decoded.data; // คืนค่า hex
+          return decoded.data;
         }
       } catch (error) {
         return null;
@@ -75,6 +73,58 @@ function AccountContent() {
     }
 
     return null;
+  };
+
+  const getNpubFromHex = (hex: string): string => {
+    try {
+      return nip19.npubEncode(hex);
+    } catch (error) {
+      return 'Error converting to npub';
+    }
+  };
+
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      notifySuccess(`${label} copied to clipboard!`);
+    }).catch(() => {
+      notifyError(`Failed to copy ${label}`);
+    });
+  };
+
+  const handleLoginWithExtension = async () => {
+    if (!window.nostr) {
+      notifyError('Nostr extension not detected. Please install Alby, Nos2x, or Nostore.');
+      return;
+    }
+
+    try {
+      const pubkey = await window.nostr.getPublicKey();
+      if (!pubkey || !/^[a-fA-F0-9]{64}$/.test(pubkey)) {
+        notifyError('Invalid public key received from extension');
+        return;
+      }
+
+      setPublicKey(pubkey);
+
+      const { data, error } = await supabase
+        .from('registered_users')
+        .select('username, lightning_address, relays')
+        .eq('public_key', pubkey)
+        .single();
+
+      if (error || !data) {
+        notifyError('User not found');
+        return;
+      }
+
+      setUserData(data);
+      setUsername(data.username);
+      setLightningAddress(data.lightning_address || '');
+      setRelays(data.relays ? data.relays.join(',') : '');
+      notifySuccess('Logged in successfully with Nostr extension!');
+    } catch (error: any) {
+      notifyError(`Failed to login with extension: ${error.message}`);
+    }
   };
 
   const handleFetchUser = async (e: React.FormEvent) => {
@@ -119,11 +169,17 @@ function AccountContent() {
     }
 
     try {
+      const convertedPublicKey = validateAndConvertPublicKey(publicKey);
+      if (!convertedPublicKey) {
+        notifyError('Invalid public key');
+        return;
+      }
+
       const { data: existingUser, error: checkError } = await supabase
         .from('registered_users')
         .select('username')
         .eq('username', username)
-        .neq('public_key', publicKey);
+        .neq('public_key', convertedPublicKey);
 
       if (checkError) {
         notifyError(`Failed to check username: ${checkError.message}`);
@@ -143,7 +199,7 @@ function AccountContent() {
           lightning_address: lightningAddress || null,
           relays: relaysArray,
         })
-        .eq('public_key', validateAndConvertPublicKey(publicKey));
+        .eq('public_key', convertedPublicKey);
 
       if (error) {
         if (error.code === '23505') {
@@ -161,32 +217,79 @@ function AccountContent() {
     }
   };
 
+  const handleDeleteAccount = async () => {
+    if (!userData) {
+      notifyError('No account data to delete');
+      return;
+    }
+
+    const convertedPublicKey = validateAndConvertPublicKey(publicKey);
+    if (!convertedPublicKey) {
+      notifyError('Invalid public key');
+      return;
+    }
+
+    const confirmed = window.confirm('Are you sure you want to delete your account? This action cannot be undone.');
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('registered_users')
+        .delete()
+        .eq('public_key', convertedPublicKey);
+
+      if (error) {
+        notifyError(`Failed to delete account: ${error.message}`);
+        return;
+      }
+
+      notifySuccess('Account deleted successfully!');
+      setUserData(null);
+      setUsername('');
+      setPublicKey('');
+      setLightningAddress('');
+      setRelays('');
+    } catch (error: any) {
+      notifyError(error.message);
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[calc(100vh-4rem)]">
       <div className="bg-card-bg p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-md transform transition-all hover:scale-105">
         <h1 className="text-3xl font-bold mb-6 text-center">Manage Account</h1>
         {!userData ? (
-          <form onSubmit={handleFetchUser} className="space-y-4">
-            <div>
-              <label htmlFor="publicKey" className="block text-sm font-medium">
-                Public Key (hex or npub)
-              </label>
-              <input
-                type="text"
-                id="publicKey"
-                value={publicKey}
-                onChange={handlePublicKeyChange}
-                className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
-                required
-              />
-            </div>
+          <>
+            <form onSubmit={handleFetchUser} className="space-y-4">
+              <div>
+                <label htmlFor="publicKey" className="block text-sm font-medium">
+                  Public Key (hex or npub)
+                </label>
+                <input
+                  type="text"
+                  id="publicKey"
+                  value={publicKey}
+                  onChange={handlePublicKeyChange}
+                  className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
+                  placeholder="Enter hex, npub, or use extension"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full bg-primary text-white p-3 rounded-lg hover:bg-primary-hover transition"
+              >
+                Fetch Account
+              </button>
+            </form>
             <button
-              type="submit"
-              className="w-full bg-primary text-white p-3 rounded-lg hover:bg-primary-hover transition"
+              onClick={handleLoginWithExtension}
+              className="w-full mt-4 bg-secondary text-white p-3 rounded-lg hover:bg-secondary-hover transition"
             >
-              Fetch Account
+              Login with Nostr Extension
             </button>
-          </form>
+          </>
         ) : (
           <form onSubmit={handleUpdate} className="space-y-4">
             <div>
@@ -201,6 +304,30 @@ function AccountContent() {
                 className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
                 required
               />
+              <div className="mt-3 p-4 bg-gradient-to-r from-primary/10 to-secondary/10 border border-primary/20 rounded-lg shadow-sm">
+                <div className="space-y-2">
+                  <div
+                    className="flex justify-between items-center cursor-pointer hover:bg-primary/20 p-2 rounded-md transition"
+                    onClick={() => copyToClipboard(publicKey, 'Public Key (hex)')}
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Public Key (hex)</p>
+                      <p className="text-xs text-foreground/80 break-all">{publicKey}</p>
+                    </div>
+                    <span className="text-primary text-xs font-semibold">Copy</span>
+                  </div>
+                  <div
+                    className="flex justify-between items-center cursor-pointer hover:bg-secondary/20 p-2 rounded-md transition"
+                    onClick={() => copyToClipboard(getNpubFromHex(publicKey), 'Public Key (npub)')}
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-foreground">Public Key (npub)</p>
+                      <p className="text-xs text-foreground/80 break-all">{getNpubFromHex(publicKey)}</p>
+                    </div>
+                    <span className="text-secondary text-xs font-semibold">Copy</span>
+                  </div>
+                </div>
+              </div>
             </div>
             <div>
               <label htmlFor="lightningAddress" className="block text-sm font-medium">
@@ -232,6 +359,13 @@ function AccountContent() {
               className="w-full bg-primary text-white p-3 rounded-lg hover:bg-primary-hover transition"
             >
               Update Account
+            </button>
+            <button
+              type="button"
+              onClick={handleDeleteAccount}
+              className="w-full mt-4 bg-red-600 text-white p-3 rounded-lg hover:bg-red-700 transition"
+            >
+              Delete Account
             </button>
           </form>
         )}
