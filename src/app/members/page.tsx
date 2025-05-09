@@ -7,6 +7,7 @@ import Navbar from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Search, Loader2 } from 'lucide-react';
 import { SimplePool, Event } from 'nostr-tools';
+import Image from 'next/image';
 
 interface Member {
   username: string;
@@ -206,13 +207,13 @@ export default function Members() {
                       >
                         <div className="flex items-start space-x-4">
                           {member.picture ? (
-                            <img
+                            <Image
                               src={member.picture}
                               alt={member.name || member.username}
-                              className="w-16 h-16 rounded-full object-cover border border-primary/20"
-                              onError={(e) => {
-                                e.currentTarget.src = 'https://via.placeholder.com/64';
-                              }}
+                              width={64}
+                              height={64}
+                              className="rounded-full object-cover border border-primary/20"
+                              unoptimized
                             />
                           ) : (
                             <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center text-foreground/60">

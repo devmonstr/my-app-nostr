@@ -86,7 +86,7 @@ function HomeContent() {
       }
 
       // Create a simple Nostr event for verification
-      const event: NostrEvent = {
+      const event = {
         kind: 1,
         content: `Registering with Nostr Address Provider at ${new Date().toISOString()}`,
         tags: [],

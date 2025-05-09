@@ -4,14 +4,14 @@ interface NostrEvent {
   content: string;
   tags: string[][];
   created_at: number;
-  pubkey?: string;
+  pubkey: string;
   id?: string;
-  sig?: string;
+  sig: string;
 }
 
 interface Nostr {
   getPublicKey(): Promise<string>;
-  signEvent(event: NostrEvent): Promise<NostrEvent>;
+  signEvent(event: Omit<NostrEvent, 'pubkey' | 'sig' | 'id'>): Promise<NostrEvent>;
 }
 
 interface Window {

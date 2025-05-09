@@ -106,7 +106,7 @@ function AccountContent() {
       }
 
       // Create a simple Nostr event for verification
-      const event: NostrEvent = {
+      const event = {
         kind: 1,
         content: `Logging into Nostr Address Provider at ${new Date().toISOString()}`,
         tags: [],
