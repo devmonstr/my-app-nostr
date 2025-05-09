@@ -1,3 +1,4 @@
+/* src/app/account/page.tsx */
 'use client';
 
 import { useState } from 'react';
@@ -6,7 +7,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider, useTheme } from '@/components/ThemeProvider';
-import { nip19 } from 'nostr-tools';
+import { nip19, verifyEvent } from 'nostr-tools';
 
 function AccountContent() {
   const [publicKey, setPublicKey] = useState('');
@@ -101,6 +102,22 @@ function AccountContent() {
       const pubkey = await window.nostr.getPublicKey();
       if (!pubkey || !/^[a-fA-F0-9]{64}$/.test(pubkey)) {
         notifyError('Invalid public key received from extension');
+        return;
+      }
+
+      // Create a simple Nostr event for verification
+      const event: NostrEvent = {
+        kind: 1,
+        content: `Logging into Nostr Address Provider at ${new Date().toISOString()}`,
+        tags: [],
+        created_at: Math.floor(Date.now() / 1000),
+      };
+
+      const signedEvent = await window.nostr.signEvent(event);
+      const isValid = verifyEvent(signedEvent);
+
+      if (!isValid || signedEvent.pubkey !== pubkey) {
+        notifyError('Failed to verify Nostr event signature');
         return;
       }
 
@@ -280,7 +297,7 @@ function AccountContent() {
                 type="submit"
                 className="w-full bg-primary text-white p-3 rounded-lg hover:bg-primary-hover transition"
               >
-                Login
+                Fetch Account
               </button>
             </form>
             <button

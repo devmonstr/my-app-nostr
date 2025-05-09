@@ -45,6 +45,9 @@ export default function Navbar() {
             <Link href="/about" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
               About
             </Link>
+            <Link href="/members" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
+              Members
+            </Link>
             <Link href="/" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
               Home
             </Link>
@@ -77,6 +80,13 @@ export default function Navbar() {
               onClick={toggleMenu}
             >
               About
+            </Link>
+            <Link
+              href="/members"
+              className="block hover:bg-nostr-hover px-3 py-2 rounded-md"
+              onClick={toggleMenu}
+            >
+              Members
             </Link>
             <Link
               href="/"
