@@ -280,7 +280,7 @@ function AccountContent() {
                 type="submit"
                 className="w-full bg-primary text-white p-3 rounded-lg hover:bg-primary-hover transition"
               >
-                Login
+                Login eiei
               </button>
             </form>
             <button
