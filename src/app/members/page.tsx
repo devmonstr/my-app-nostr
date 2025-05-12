@@ -7,6 +7,8 @@ import Navbar from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Search, Loader2 } from 'lucide-react';
 import { SimplePool, Event } from 'nostr-tools';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface Member {
   username: string;
@@ -28,6 +30,16 @@ export default function Members() {
   const membersPerPage = 10;
   const TTL_SECONDS = 24 * 60 * 60; // 24 hours in seconds
 
+  const notifyError = (message: string) =>
+    toast.error(message, {
+      position: 'top-center',
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+
   useEffect(() => {
     const fetchMembers = async () => {
       try {
@@ -43,34 +55,38 @@ export default function Members() {
 
         // Check TTL and reset metadata if expired
         const now = new Date();
-        const membersWithTTLChecked = await Promise.all(
-          initialMembers.map(async (member) => {
-            if (
-              member.metadata_updated_at &&
-              (now.getTime() - new Date(member.metadata_updated_at).getTime()) / 1000 > TTL_SECONDS
-            ) {
-              // Metadata expired, reset to null and update timestamp
-              await supabase
-                .from('registered_users')
-                .update({
-                  name: null,
-                  about: null,
-                  picture: null,
-                  metadata_updated_at: null,
-                })
-                .eq('public_key', member.public_key);
-
-              return { ...member, name: null, about: null, picture: null, metadata_updated_at: null };
-            }
-            return member;
-          })
+        const expiredMembers = initialMembers.filter(
+          (member) =>
+            member.metadata_updated_at &&
+            (now.getTime() - new Date(member.metadata_updated_at).getTime()) / 1000 > TTL_SECONDS
         );
 
-        setMembers(membersWithTTLChecked);
-        setFilteredMembers(membersWithTTLChecked);
+        if (expiredMembers.length > 0) {
+          // Batch update to reset expired metadata
+          const publicKeys = expiredMembers.map((member) => member.public_key);
+          await supabase
+            .from('registered_users')
+            .update({
+              name: null,
+              about: null,
+              picture: null,
+              metadata_updated_at: null,
+            })
+            .in('public_key', publicKeys);
+        }
+
+        // Refresh members after resetting expired metadata
+        const updatedMembers = initialMembers.map((member) =>
+          expiredMembers.some((expired) => expired.public_key === member.public_key)
+            ? { ...member, name: null, about: null, picture: null, metadata_updated_at: null }
+            : member
+        );
+
+        setMembers(updatedMembers);
+        setFilteredMembers(updatedMembers);
 
         // Fetch metadata for members that need it
-        const membersNeedingMetadata = membersWithTTLChecked.filter(
+        const membersNeedingMetadata = updatedMembers.filter(
           (member) => !member.name && !member.about && !member.picture
         );
 
@@ -84,7 +100,7 @@ export default function Members() {
             'wss://relay.nostr.band',
           ];
 
-          const userRelays = membersWithTTLChecked
+          const userRelays = updatedMembers
             .filter((member) => member.relays)
             .flatMap((member) => member.relays || []);
 
@@ -133,17 +149,27 @@ export default function Members() {
                 pool.close(allRelays);
                 setFetchingMetadata(false);
               },
+              onerror(error) {
+                console.error('Error fetching metadata:', error);
+                notifyError('Failed to fetch metadata from relays. Some data may be outdated.');
+                pool.close(allRelays);
+                setFetchingMetadata(false);
+              },
             }
           );
 
           setTimeout(() => {
             sub.close();
             pool.close(allRelays);
-            setFetchingMetadata(false);
+            if (fetchingMetadata) {
+              notifyError('Metadata fetch timed out. Some data may be missing.');
+              setFetchingMetadata(false);
+            }
           }, 10000); // 10 seconds timeout
         }
       } catch (error: any) {
         console.error('Error fetching members:', error.message);
+        notifyError('Failed to load members. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -296,6 +322,7 @@ export default function Members() {
               )}
             </div>
           )}
+          <ToastContainer position="top-center" />
         </div>
       </div>
     </ThemeProvider>
