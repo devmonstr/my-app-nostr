@@ -15,6 +15,7 @@ interface Member {
   name?: string;
   about?: string;
   picture?: string;
+  metadata_updated_at?: string;
 }
 
 export default function Members() {
@@ -25,6 +26,7 @@ export default function Members() {
   const [fetchingMetadata, setFetchingMetadata] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const membersPerPage = 10;
+  const TTL_SECONDS = 24 * 60 * 60; // 24 hours in seconds
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -32,17 +34,43 @@ export default function Members() {
         setLoading(true);
         const { data, error } = await supabase
           .from('registered_users')
-          .select('username, public_key, created_at, relays, name, about, picture')
+          .select('username, public_key, created_at, relays, name, about, picture, metadata_updated_at')
           .order('created_at', { ascending: false });
 
         if (error) throw error;
 
         const initialMembers = data || [];
-        setMembers(initialMembers);
-        setFilteredMembers(initialMembers);
 
-        // Check if any members need metadata fetching
-        const membersNeedingMetadata = initialMembers.filter(
+        // Check TTL and reset metadata if expired
+        const now = new Date();
+        const membersWithTTLChecked = await Promise.all(
+          initialMembers.map(async (member) => {
+            if (
+              member.metadata_updated_at &&
+              (now.getTime() - new Date(member.metadata_updated_at).getTime()) / 1000 > TTL_SECONDS
+            ) {
+              // Metadata expired, reset to null and update timestamp
+              await supabase
+                .from('registered_users')
+                .update({
+                  name: null,
+                  about: null,
+                  picture: null,
+                  metadata_updated_at: null,
+                })
+                .eq('public_key', member.public_key);
+
+              return { ...member, name: null, about: null, picture: null, metadata_updated_at: null };
+            }
+            return member;
+          })
+        );
+
+        setMembers(membersWithTTLChecked);
+        setFilteredMembers(membersWithTTLChecked);
+
+        // Fetch metadata for members that need it
+        const membersNeedingMetadata = membersWithTTLChecked.filter(
           (member) => !member.name && !member.about && !member.picture
         );
 
@@ -56,7 +84,7 @@ export default function Members() {
             'wss://relay.nostr.band',
           ];
 
-          const userRelays = initialMembers
+          const userRelays = membersWithTTLChecked
             .filter((member) => member.relays)
             .flatMap((member) => member.relays || []);
 
@@ -73,9 +101,10 @@ export default function Members() {
                     name: metadata.name,
                     about: metadata.about,
                     picture: metadata.picture,
+                    metadata_updated_at: new Date().toISOString(),
                   };
 
-                  // Update Supabase with metadata
+                  // Update Supabase with metadata and timestamp
                   await supabase
                     .from('registered_users')
                     .update(updatedMember)
