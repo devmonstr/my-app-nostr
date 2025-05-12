@@ -1,3 +1,4 @@
+/* src/app/page.tsx */
 'use client';
 
 import { useState } from 'react';
@@ -7,7 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider, useTheme } from '@/components/ThemeProvider';
-import { nip19 } from 'nostr-tools';
+import { nip19, verifyEvent } from 'nostr-tools';
 
 function HomeContent() {
   const [username, setUsername] = useState('');
@@ -84,10 +85,26 @@ function HomeContent() {
         return;
       }
 
+      // Create a simple Nostr event for verification
+      const event: NostrEvent = {
+        kind: 1,
+        content: `Registering with Nostr Address Provider at ${new Date().toISOString()}`,
+        tags: [],
+        created_at: Math.floor(Date.now() / 1000),
+      };
+
+      const signedEvent = await window.nostr.signEvent(event);
+      const isValid = verifyEvent(signedEvent);
+
+      if (!isValid || signedEvent.pubkey !== pubkey) {
+        notifyError('Failed to verify Nostr event signature');
+        return;
+      }
+
       setPublicKey(pubkey);
-      notifySuccess('Public key loaded from Nostr extension. Please complete the form to register.');
+      notifySuccess('Public key verified with Nostr extension. Please complete the form to register.');
     } catch (error: any) {
-      notifyError(`Failed to get public key from extension: ${error.message}`);
+      notifyError(`Failed to register with extension: ${error.message}`);
     }
   };
 
