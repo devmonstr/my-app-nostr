@@ -176,7 +176,7 @@ function HomeContent() {
   return (
     <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[calc(100vh-4rem)]">
       <div className="bg-card-bg p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-md transform transition-all hover:scale-105">
-        <h1 className="text-3xl font-bold mb-6 text-center">Nostr Address Provider</h1>
+        <h1 className="text-3xl font-bold mb-6 text-center">Free NIP-05 Identifiers</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="username" className="block text-sm font-medium">
