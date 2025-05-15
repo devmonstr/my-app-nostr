@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import { Search, Loader2 } from 'lucide-react';
-import { SimplePool, Event } from 'nostr-tools';
+import { SimplePool, Event, nip19 } from 'nostr-tools';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -39,6 +39,15 @@ export default function Members() {
       pauseOnHover: true,
       draggable: true,
     });
+
+  const getNpubFromHex = (hex: string): string => {
+    try {
+      return nip19.npubEncode(hex);
+    } catch (error) {
+      console.error('Error converting hex to npub:', error);
+      return hex; // Fallback to hex if conversion fails
+    }
+  };
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -149,6 +158,12 @@ export default function Members() {
                 pool.close(allRelays);
                 setFetchingMetadata(false);
               },
+              onerror(error) {
+                console.error('Error fetching metadata:', error);
+                notifyError('Failed to fetch metadata from relays. Some data may be outdated.');
+                pool.close(allRelays);
+                setFetchingMetadata(false);
+              },
             }
           );
 
@@ -176,7 +191,8 @@ export default function Members() {
     const filtered = members.filter(
       (member) =>
         (member.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-         member.public_key.toLowerCase().includes(searchQuery.toLowerCase())) ||
+         member.public_key.toLowerCase().includes(searchQuery.toLowerCase()) ||
+         getNpubFromHex(member.public_key).toLowerCase().includes(searchQuery.toLowerCase())) ||
         (member.name && member.name.toLowerCase().includes(searchQuery.toLowerCase()))
     );
     setFilteredMembers(filtered);
@@ -270,7 +286,7 @@ export default function Members() {
                               {member.name || member.username}
                             </p>
                             <p className="text-sm text-foreground/80 break-all">
-                              {member.public_key}
+                              {getNpubFromHex(member.public_key)}
                             </p>
                             {member.about && (
                               <p className="text-sm text-foreground/70 mt-1">{member.about}</p>
