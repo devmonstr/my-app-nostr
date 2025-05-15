@@ -158,13 +158,13 @@ export default function Members() {
                 pool.close(allRelays);
                 setFetchingMetadata(false);
               },
-              onerror(error) {
+              onerror: (error: Error) => {
                 console.error('Error fetching metadata:', error);
                 notifyError('Failed to fetch metadata from relays. Some data may be outdated.');
                 pool.close(allRelays);
                 setFetchingMetadata(false);
               },
-            }
+            } as any
           );
 
           setTimeout(() => {
