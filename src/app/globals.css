@@ -92,13 +92,13 @@ body {
 }
 
 /* ปรับแต่ง React Toastify */
-.Toastify__toast-container--top-center {
+/* .Toastify__toast-container--top-center {
   top: 50% !important;
-  left: 50% !important;
+  left: 50% !important; 
   transform: translate(-50%, -50%) !important;
   width: 90%;
   max-width: 400px;
-}
+} */
 
 .Toastify__toast {
   border-radius: 8px;

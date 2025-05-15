@@ -19,7 +19,7 @@ function HomeContent() {
 
   const notifySuccess = (message: string) =>
     toast.success(message, {
-      position: 'top-center',
+      position: 'top-right',
       autoClose: 3000,
       hideProgressBar: false,
       closeOnClick: true,
@@ -30,7 +30,7 @@ function HomeContent() {
 
   const notifyError = (message: string) =>
     toast.error(message, {
-      position: 'top-center',
+      position: 'top-right',
       autoClose: 5000,
       hideProgressBar: false,
       closeOnClick: true,
