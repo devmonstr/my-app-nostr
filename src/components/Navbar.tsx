@@ -42,14 +42,14 @@ export default function Navbar() {
             </span>
           </div>
           <div className="hidden md:flex items-center space-x-4">
+            <Link href="/" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
+              Home
+            </Link>
             <Link href="/about" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
               About
             </Link>
             <Link href="/members" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
               Members
-            </Link>
-            <Link href="/" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
-              Home
             </Link>
             <Link href="/account" className="hover:bg-nostr-hover px-3 py-2 rounded-md">
               Account
