@@ -5,8 +5,8 @@ export function middleware(request: NextRequest) {
   const allowedOrigins = [
     'http://192.168.1.96:3001',
     'http://localhost:3001',
-    'https://monstr.dev',
-    'https://izna.us',
+    'https://nvrs.xyz',
+    'https://nvrs.us',
   ];
   const corsOrigin = allowedOrigins.includes(origin) ? origin : null;
 
