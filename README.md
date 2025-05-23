@@ -1,10 +1,10 @@
-# my-app-nostr
+# nvrs-nostr-address
 
 [Live Demo](https://nvrs.xyz)
 
 ## About
 
-**my-app-nostr** is a web application that enables users to obtain free [Nostr](https://nostr.com/) addresses using the [NIP-05](https://github.com/nostr-protocol/nips/blob/master/05.md) protocol. With simple registration and instant address assignment, anyone can get their own NIP-05 identifier—no cost, no hassle.
+**nvrs-nostr-address** is a web application that enables users to obtain free [Nostr](https://nostr.com/) addresses using the [NIP-05](https://github.com/nostr-protocol/nips/blob/master/05.md) protocol. With simple registration and instant address assignment, anyone can get their own NIP-05 identifier—no cost, no hassle.
 
 ## Features
 
@@ -31,8 +31,8 @@
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/devmonstr/my-app-nostr.git
-   cd my-app-nostr
+   git clone https://github.com/devmonstr/nvrs-nostr-address.git
+   cd nvrs-nostr-address
    ```
 
 2. **Install dependencies:**
@@ -82,7 +82,7 @@ This project is open source—see the [LICENSE](LICENSE) file for details.
 ## Contact
 
 - Author: [devmonstr](https://github.com/devmonstr)
-- Project URL: [https://github.com/devmonstr/my-app-nostr](https://github.com/devmonstr/my-app-nostr)
+- Project URL: [https://github.com/devmonstr/nvrs-nostr-address](https://github.com/devmonstr/nvrs-nostr-address)
 
 ---
 
