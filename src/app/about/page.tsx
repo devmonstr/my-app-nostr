@@ -9,8 +9,8 @@ export default function About() {
       <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
         <Navbar />
         <div className="container mx-auto px-4 py-12 flex items-center justify-center">
-          <div className="bg-card-bg p-8 rounded-xl shadow-xl w-full max-w-2xl transform transition-all hover:scale-105">
-            <h1 className="text-4xl font-bold mb-6 text-center bg-gradient-to-r from-primary to-secondary bg-clip-text">
+          <div className="bg-card-bg p-8 rounded-xl shadow-xl w-full max-w-2xl transform transition-all">
+            <h1 className="text-4xl font-extrabold mb-2 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-orange-600">
               About Monstr
             </h1>
             <div className="space-y-6 text-foreground/90">

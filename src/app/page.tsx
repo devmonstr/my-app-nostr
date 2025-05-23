@@ -9,6 +9,8 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider, useTheme } from '@/components/ThemeProvider';
 import { nip19, verifyEvent } from 'nostr-tools';
+import { User, Key, Zap, Link as LinkIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 function HomeContent() {
   const [username, setUsername] = useState('');
@@ -17,7 +19,8 @@ function HomeContent() {
   const [relays, setRelays] = useState('');
   const { theme } = useTheme();
 
-  const notifySuccess = (message: string) =>
+  const notifySuccess = (message: string) => {
+    toast.dismiss();
     toast.success(message, {
       position: 'top-right',
       autoClose: 3000,
@@ -27,8 +30,10 @@ function HomeContent() {
       draggable: true,
       theme,
     });
+  };
 
-  const notifyError = (message: string) =>
+  const notifyError = (message: string) => {
+    toast.dismiss();
     toast.error(message, {
       position: 'top-right',
       autoClose: 5000,
@@ -38,6 +43,7 @@ function HomeContent() {
       draggable: true,
       theme,
     });
+  };
 
   const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -85,7 +91,6 @@ function HomeContent() {
         return;
       }
 
-      // Create a simple Nostr event for verification
       const event: NostrEvent = {
         kind: 1,
         content: `Registering with Nostr Address Provider at ${new Date().toISOString()}`,
@@ -174,82 +179,105 @@ function HomeContent() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 flex items-center justify-center min-h-[calc(100vh-4rem)]">
-      <div className="bg-card-bg p-6 sm:p-8 rounded-xl shadow-xl w-full max-w-md transform transition-all hover:scale-105">
-        <h1 className="text-3xl font-bold mb-6 text-center">Free NIP-05 Identifiers</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium">
+    <div className="mx-auto px-4 py-16 flex items-center justify-center min-h-[calc(100vh-4rem)] bg-background">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="bg-card-bg p-8 rounded-2xl shadow-2xl w-full max-w-lg border border-input-border"
+      >
+        <h1 className="text-4xl font-extrabold mb-2 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-orange-600">
+          Free NIP-05 Identifiers
+        </h1>
+        <p className="text-center text-foreground/70 mb-8 font-medium">
+          Register your Nostr identity with ease
+        </p>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="relative">
+            <label htmlFor="username" className="block text-sm font-medium text-foreground mb-2">
               Username
             </label>
-            <input
-              type="text"
-              id="username"
-              value={username}
-              onChange={handleUsernameChange}
-              className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
-              required
-            />
+            <div className="relative">
+              <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50" size={18} />
+              <input
+                type="text"
+                id="username"
+                value={username}
+                onChange={handleUsernameChange}
+                className="w-full pl-10 pr-4 py-3 bg-input-bg border border-input-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder-foreground/50 transition-all duration-300"
+                placeholder="Enter your username"
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="publicKey" className="block text-sm font-medium">
+          <div className="relative">
+            <label htmlFor="publicKey" className="block text-sm font-medium text-foreground mb-2">
               Public Key (hex or npub)
             </label>
-            <input
-              type="text"
-              id="publicKey"
-              value={publicKey}
-              onChange={handlePublicKeyChange}
-              className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
-              placeholder="Enter hex, npub, or use extension"
-              required
-            />
+            <div className="relative">
+              <Key className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50" size={18} />
+              <input
+                type="text"
+                id="publicKey"
+                value={publicKey}
+                onChange={handlePublicKeyChange}
+                className="w-full pl-10 pr-4 py-3 bg-input-bg border border-input-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder-foreground/50 transition-all duration-300"
+                placeholder="Enter hex, npub, or use extension"
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="lightningAddress" className="block text-sm font-medium">
+          <div className="relative">
+            <label htmlFor="lightningAddress" className="block text-sm font-medium text-foreground mb-2">
               Lightning Address (optional)
             </label>
-            <input
-              type="text"
-              id="lightningAddress"
-              value={lightningAddress}
-              onChange={(e) => setLightningAddress(e.target.value)}
-              className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
-            />
+            <div className="relative">
+              <Zap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50" size={18} />
+              <input
+                type="text"
+                id="lightningAddress"
+                value={lightningAddress}
+                onChange={(e) => setLightningAddress(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-input-bg border border-input-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder-foreground/50 transition-all duration-300"
+                placeholder="user@domain.com"
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="relays" className="block text-sm font-medium">
+          <div className="relative">
+            <label htmlFor="relays" className="block text-sm font-medium text-foreground mb-2">
               Relays (comma-separated, optional)
             </label>
-            <input
-              type="text"
-              id="relays"
-              value={relays}
-              onChange={(e) => setRelays(e.target.value)}
-              className="mt-1 p-3 w-full border rounded-lg focus:ring-2 focus:ring-primary transition bg-input-bg border-input-border text-foreground"
-              placeholder="wss://relay1.com,wss://relay2.com"
-            />
+            <div className="relative">
+              <LinkIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 text-foreground/50" size={18} />
+              <input
+                type="text"
+                id="relays"
+                value={relays}
+                onChange={(e) => setRelays(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-input-bg border border-input-border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-foreground placeholder-foreground/50 transition-all duration-300"
+                placeholder="wss://relay1.com, wss://relay2.com"
+              />
+            </div>
           </div>
           <button
             type="submit"
-            className="w-full bg-primary text-white p-3 rounded-lg hover:bg-primary-hover transition"
+            className="w-full bg-primary text-white p-3 rounded-lg hover:bg-primary-hover transform hover:scale-105 transition-all duration-300 font-semibold shadow-md"
           >
             Register
           </button>
         </form>
         <button
           onClick={handleRegisterWithExtension}
-          className="w-full mt-4 bg-secondary text-white p-3 rounded-lg hover:bg-secondary-hover transition"
+          className="w-full mt-4 bg-secondary text-white p-3 rounded-lg hover:bg-secondary-hover transform hover:scale-105 transition-all duration-300 font-semibold shadow-md"
         >
           Register with Nostr Extension
         </button>
         <Link href="/account">
-          <button className="w-full mt-4 bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transition">
+          <button className="w-full mt-4 bg-gray-600 text-white p-3 rounded-lg hover:bg-gray-700 transform hover:scale-105 transition-all duration-300 font-semibold shadow-md">
             Manage Account
           </button>
         </Link>
-        <ToastContainer position="top-center" />
-      </div>
+      </motion.div>
     </div>
   );
 }
@@ -257,9 +285,10 @@ function HomeContent() {
 export default function Home() {
   return (
     <ThemeProvider>
-      <div className="min-h-screen bg-background text-foreground transition-colors duration-300">
+      <div className="min-h-screen bg-background text-foreground font-sans">
         <Navbar />
         <HomeContent />
+        <ToastContainer position="top-right" />
       </div>
     </ThemeProvider>
   );
