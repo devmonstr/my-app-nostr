@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import Navbar from '@/components/Navbar';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import { User, Key, Zap, Link as LinkIcon, AlertCircle } from 'lucide-react';
+import { User, Key, Zap, Link as LinkIcon, AlertCircle, Users, UserPlus } from 'lucide-react';
 import { nip19, SimplePool, Event } from 'nostr-tools';
 import { motion } from 'framer-motion';
 import React from 'react';
@@ -22,6 +22,10 @@ interface ProfileData {
   picture: string | null;
   banner: string | null;
   metadata_updated_at: string | null;
+  name: string | null; // เพิ่ม name
+  about: string | null; // เพิ่ม about
+  followers: number; // เพิ่ม followers
+  following: number; // เพิ่ม following
 }
 
 export default function Profile({ params }: ProfileParams) {
@@ -39,6 +43,43 @@ export default function Profile({ params }: ProfileParams) {
     }
   };
 
+  const fetchFollowersAndFollowing = async (pubkey: string, relays: string[]): Promise<{ followers: number; following: number }> => {
+    const pool = new SimplePool();
+    let followers = 0;
+    let following = 0;
+
+    try {
+      // ดึง events kind 3 (Contact List) เพื่อหา following
+      const followingEvents = await pool.querySync(relays, {
+        kinds: [3],
+        authors: [pubkey],
+      });
+
+      if (followingEvents.length > 0) {
+        const latestEvent = followingEvents.reduce((latest: Event, current: Event) =>
+          current.created_at > latest.created_at ? current : latest
+        );
+        following = latestEvent.tags.filter((tag) => tag[0] === 'p').length;
+      }
+
+      // ดึง events kind 3 เพื่อหา followers (คนที่ follow ผู้ใช้คนนี้)
+      const followerEvents = await pool.querySync(relays, {
+        kinds: [3],
+      });
+
+      followers = followerEvents.filter((event: Event) =>
+        event.tags.some((tag) => tag[0] === 'p' && tag[1] === pubkey)
+      ).length;
+
+      return { followers, following };
+    } catch (error) {
+      console.error('Error fetching followers/following:', error);
+      return { followers: 0, following: 0 };
+    } finally {
+      pool.close(relays);
+    }
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -47,7 +88,7 @@ export default function Profile({ params }: ProfileParams) {
         // ดึงข้อมูลจาก Supabase ก่อน
         const { data, error } = await supabase
           .from('registered_users')
-          .select('username, public_key, lightning_address, relays, picture, banner, metadata_updated_at')
+          .select('username, public_key, lightning_address, relays, picture, banner, metadata_updated_at, name, about, followers, following')
           .eq('username', username)
           .single();
 
@@ -56,7 +97,7 @@ export default function Profile({ params }: ProfileParams) {
           return;
         }
 
-        let profile = data;
+        let profile = data as ProfileData;
 
         // ตรวจสอบ TTL และรีเซ็ต metadata ถ้าหมดอายุ
         const now = new Date();
@@ -70,17 +111,19 @@ export default function Profile({ params }: ProfileParams) {
             .update({
               picture: null,
               banner: null,
+              name: null,
+              about: null,
               metadata_updated_at: null,
             })
             .eq('public_key', profile.public_key);
 
-          profile = { ...profile, picture: null, banner: null, metadata_updated_at: null };
+          profile = { ...profile, picture: null, banner: null, name: null, about: null, metadata_updated_at: null };
         }
 
         setProfileData(profile);
 
-        // หากไม่มี picture หรือ banner ให้ดึงจาก Nostr
-        if (!profile.picture || !profile.banner) {
+        // หากไม่มี picture, banner, name, about หรือ followers/following ให้ดึงจาก Nostr
+        if (!profile.picture || !profile.banner || !profile.name || !profile.about || profile.followers === 0 || profile.following === 0) {
           const pool = new SimplePool();
           const relays = [
             'wss://relay.damus.io',
@@ -91,6 +134,7 @@ export default function Profile({ params }: ProfileParams) {
           const userRelays = profile.relays || [];
           const allRelays = [...new Set([...relays, ...userRelays])];
 
+          // ดึง metadata (kind: 0)
           const sub = pool.subscribeMany(
             allRelays,
             [{ kinds: [0], authors: [profile.public_key] }],
@@ -98,11 +142,20 @@ export default function Profile({ params }: ProfileParams) {
               async onevent(event: Event) {
                 try {
                   const metadata = JSON.parse(event.content);
-                  const updatedMember = {
+                  const updatedMember: Partial<ProfileData> = {
                     picture: metadata.picture || null,
                     banner: metadata.banner || null,
+                    name: metadata.name || null,
+                    about: metadata.about || null,
                     metadata_updated_at: new Date().toISOString(),
                   };
+
+                  // ดึง followers และ following ถ้ายังไม่มี
+                  if (profile.followers === 0 || profile.following === 0) {
+                    const { followers, following } = await fetchFollowersAndFollowing(profile.public_key, allRelays);
+                    updatedMember.followers = followers;
+                    updatedMember.following = following;
+                  }
 
                   // อัปเดต Supabase
                   await supabase
@@ -221,7 +274,7 @@ export default function Profile({ params }: ProfileParams) {
                 transition={{ duration: 0.6, ease: 'easeOut', delay: 0.2 }}
                 className={`bg-[var(--card-bg)] p-8 rounded-b-2xl shadow-2xl w-full border border-[var(--card-border)] border-t-0 ${
                   profileData.banner ? 'pt-16' : 'rounded-t-2xl pt-16'
-                }`} // ใช้สีจาก Theme
+                }`}
               >
                 <div className="flex flex-col items-center mb-6">
                   {/* Avatar หากไม่มี banner ให้แสดงตรงนี้ */}
@@ -243,12 +296,27 @@ export default function Profile({ params }: ProfileParams) {
                       </div>
                     )
                   ) : null}
-                  <h1 className="text-4xl font-extrabold text-center text-[var(--foreground)]">
-                    {profileData.username}'s Profile
+                  <h1 className="text-4xl font-extrabold mb-2 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-orange-600">
+                    {profileData.name || profileData.username}'s Profile
                   </h1>
                   <p className="text-center text-[var(--foreground)]/[0.7] mt-2 font-medium">
                     Public Nostr Identity
                   </p>
+                  {profileData.about && (
+                    <p className="text-center text-[var(--foreground)]/[0.7] mt-2 italic">
+                      "{profileData.about}"
+                    </p>
+                  )}
+                  <div className="flex gap-4 mt-4">
+                    <div className="flex items-center gap-1">
+                      <Users className="text-[var(--primary)]" size={18} />
+                      <span className="text-[var(--foreground)] font-medium">{profileData.followers} Followers</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <UserPlus className="text-[var(--primary)]" size={18} />
+                      <span className="text-[var(--foreground)] font-medium">{profileData.following} Following</span>
+                    </div>
+                  </div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 p-2">
