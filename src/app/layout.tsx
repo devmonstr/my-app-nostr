@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "NVRS - Free NIP-05 Identifiers",
+  title: "nvrs - Free NIP-05 Identifiers",
   description: "NIP-05 identity services",
 };
 
