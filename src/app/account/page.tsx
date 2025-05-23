@@ -16,11 +16,11 @@ function AccountContent() {
   const [userData, setUserData] = useState<{
     username: string;
     lightning_address: string | null;
-    relays: string | null;
+    relays: string[] | null; // ปรับ Type จาก string | null เป็น string[] | null
   } | null>(null);
   const [username, setUsername] = useState('');
   const [lightningAddress, setLightningAddress] = useState('');
-  const [relays, setRelays] = useState('');
+  const [relays, setRelays] = useState(''); // relays ยังคงเป็น string สำหรับ input
   const [lastLoginTime, setLastLoginTime] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [confirmUsername, setConfirmUsername] = useState('');
@@ -31,11 +31,12 @@ function AccountContent() {
     const storedUserData = localStorage.getItem('userData');
     const storedLastLogin = localStorage.getItem('lastLoginTime');
     if (storedPublicKey && storedUserData) {
+      const parsedUserData = JSON.parse(storedUserData);
       setPublicKey(storedPublicKey);
-      setUserData(JSON.parse(storedUserData));
-      setUsername(JSON.parse(storedUserData).username);
-      setLightningAddress(JSON.parse(storedUserData).lightning_address || '');
-      setRelays(JSON.parse(storedUserData).relays ? JSON.parse(storedUserData).relays.join(',') : '');
+      setUserData(parsedUserData);
+      setUsername(parsedUserData.username);
+      setLightningAddress(parsedUserData.lightning_address || '');
+      setRelays(parsedUserData.relays ? parsedUserData.relays.join(', ') : ''); // แปลง string[] เป็น string สำหรับ input
     }
     if (storedLastLogin) {
       setLastLoginTime(storedLastLogin);
@@ -151,7 +152,7 @@ function AccountContent() {
       setUserData(data);
       setUsername(data.username);
       setLightningAddress(data.lightning_address || '');
-      setRelays(data.relays ? data.relays.join(',') : '');
+      setRelays(data.relays ? data.relays.join(', ') : '');
 
       localStorage.setItem('publicKey', pubkey);
       localStorage.setItem('userData', JSON.stringify(data));
