@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# my-app-nostr
+
+[Live Demo](https://nvrs.xyz)
+
+## About
+
+**my-app-nostr** is a web application that enables users to obtain free [Nostr](https://nostr.com/) addresses using the [NIP-05](https://github.com/nostr-protocol/nips/blob/master/05.md) protocol. With simple registration and instant address assignment, anyone can get their own NIP-05 identifier—no cost, no hassle.
+
+## Features
+
+- Free NIP-05 address registration for Nostr protocol.
+- Modern authentication and database handling via Supabase.
+- Fast, scalable, and server-side rendered with Next.js.
+- Built with TypeScript for type safety and maintainability.
+
+## Tech Stack
+
+- [Next.js](https://nextjs.org/) (React framework)
+- [Supabase](https://supabase.com/) (authentication & database)
+- [TypeScript](https://www.typescriptlang.org/)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Node.js (v18+ recommended)
+- npm or yarn
+- Supabase account and project (for backend setup)
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/devmonstr/my-app-nostr.git
+   cd my-app-nostr
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-## Learn More
+3. **Configure Supabase:**
+   - Create a project at [Supabase](https://app.supabase.com/).
+   - Copy your Supabase credentials (`SUPABASE_URL` and `SUPABASE_ANON_KEY`).
+   - Create a `.env.local` file in the root directory:
+     ```
+     NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+     NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+     ```
 
-To learn more about Next.js, take a look at the following resources:
+4. **Run the development server:**
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
+   Visit [http://localhost:3000](http://localhost:3000) to view the app.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Visit the live site or run locally.
+- Sign up or log in.
+- Register a NIP-05 address and start using it with your Nostr client.
 
-## Deploy on Vercel
+## Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Contributions, issues and feature requests are welcome!
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Fork this repo.
+2. Create your feature branch (`git checkout -b feature/YourFeature`).
+3. Commit your changes (`git commit -am 'Add new feature'`).
+4. Push to the branch (`git push origin feature/YourFeature`).
+5. Open a pull request.
+
+## License
+
+This project is open source—see the [LICENSE](LICENSE) file for details.
+
+## Contact
+
+- Author: [devmonstr](https://github.com/devmonstr)
+- Project URL: [https://github.com/devmonstr/my-app-nostr](https://github.com/devmonstr/my-app-nostr)
+
+---
+
+> Powered by Supabase, Next.js, and the Nostr protocol.
