@@ -18,24 +18,14 @@ export default function About() {
                 Welcome to <span className="font-semibold text-primary">Monstr</span>, a cutting-edge platform designed to seamlessly manage your Nostr identities with ease and precision. What makes this project truly unique is its origin story — every single line of code, design decision, and feature implementation has been crafted entirely through the power of artificial intelligence.
               </p>
               <p className="text-lg leading-relaxed">
-                This website was developed 100% using <span className="font-semibold text-secondary">Grok</span>, an advanced AI created by <span className="font-semibold text-primary">xAI</span>. Grok's unparalleled ability to understand complex requirements, generate robust code, and refine user experiences has enabled us to build a platform that is not only functional but also elegant and user-centric.
+                This website was developed 100% using <span className="font-semibold text-secondary">AI</span>. AI's ability to understand complex requirements, generate robust code, and refine user experiences has enabled us to build a platform that is not only functional but also elegant and user-centric.
               </p>
               <p className="text-lg leading-relaxed">
-                By leveraging Grok's innovative capabilities, we’ve pushed the boundaries of what’s possible in web development, creating a tool that empowers the Nostr community while showcasing the transformative potential of AI-driven development. Our mission is to provide a reliable, intuitive, and secure service for managing your Nostr addresses — all while demonstrating the future of technology through AI.
+                By leveraging AI's innovative capabilities, we’ve pushed the boundaries of what’s possible in web development, creating a tool that empowers the Nostr community while showcasing the transformative potential of AI-driven development. Our mission is to provide a reliable, intuitive, and secure service for managing your Nostr addresses — all while demonstrating the future of technology through AI.
               </p>
               <p className="text-lg leading-relaxed text-center">
                 Join us on this journey and experience the magic of a platform born from the synergy of human creativity and artificial intelligence.
               </p>
-            </div>
-            <div className="mt-8 text-center">
-              <a
-                href="https://x.ai"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-primary text-white py-3 px-6 rounded-lg hover:bg-primary-hover transition-all duration-300 transform hover:scale-105"
-              >
-                Learn More About xAI
-              </a>
             </div>
           </div>
         </div>
