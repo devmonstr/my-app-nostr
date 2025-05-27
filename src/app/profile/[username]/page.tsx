@@ -223,9 +223,9 @@ export default function Profile({ params }: ProfileParams) {
               className="bg-[var(--card-bg)] p-8 rounded-2xl shadow-2xl w-full max-w-lg border-gradient text-center"
             >
               <AlertCircle className="mx-auto text-red-500" size={48} />
-              <h1 className="text-2xl font-semibold mt-4 text-[var(--foreground)]">ไม่พบผู้ใช้งานนี้</h1>
+              <h1 className="text-2xl font-semibold mt-4 text-[var(--foreground)]">User not found.</h1>
               <p className="text-[var(--foreground)]/[0.7] mt-2 font-medium">
-                ไม่พบผู้ใช้งานชื่อ "{username}" ในระบบ กรุณาตรวจสอบชื่อผู้ใช้งานอีกครั้ง
+                The username "{username}" was not found in the system. Please check the username again.
               </p>
             </motion.div>
           ) : profileData ? (
